@@ -1,0 +1,1 @@
+{"type":"record","name":"Payment","namespace":"io.confluent.dabz.examples.producer","fields":[{"name":"id","type":"string"},{"name":"amount","type":"double"}]}
