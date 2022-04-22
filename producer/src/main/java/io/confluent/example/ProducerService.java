@@ -24,13 +24,14 @@ public class ProducerService {
     /**
      * We rely on {@link Producer} instead of {@link KafkaProducer} to inject
      * a {@link org.apache.kafka.clients.producer.MockProducer} during unit tests
-      */
-    private Producer<String, Payment> kafkaProducer;
+     */
+    private final Producer<String, Payment> kafkaProducer;
 
     /**
      * Always inject Apache Kafka client configuration dynamically
      * e.g. from a Configuration file, from a ConfigMap, from Environment variables, etc..
-     * @param configurationPath path of the configuration file containing the client configuration
+     *
+     * @param configurationPath Input Streams containing the client configuration
      */
     public static ProducerService buildProducer(InputStream configurationPath) throws Exception {
         var properties = new Properties();
@@ -60,13 +61,13 @@ public class ProducerService {
         return producerService;
     }
 
-    private ProducerService(Producer<String, Payment> kafkaProducer) {
+    protected ProducerService(Producer<String, Payment> kafkaProducer) {
         this.kafkaProducer = kafkaProducer;
     }
 
     public void generateDataInKafka() {
         for (int i = 0; i < 100; i++) {
-            // Builder is ensuring that the payload is valid
+            // Avro Builder is ensuring that the payload is valid
             // Quite convenient to avoid surprises during serialization
             Payment payment = Payment.newBuilder()
                     .setId(UUID.randomUUID().toString())
@@ -82,17 +83,21 @@ public class ProducerService {
             // NOTE: Send is an asynchronous method, avoid doing synchronous send (kafkaProducer.send(...).get())
             // Synchronous send will affect performance of your applications
 
-            // NOTE: KafkaProducer already have builtin retries builtin
-            // With the default configuration, it retries for 2 minutes all "Retriable" exceptions
+            // NOTE: KafkaProducer already have retries out-of-the-box
+            // With the default configuration, it retries for 2 minutes all "Retriable" (e.g. Timeout, UnknowLeader) exceptions
             kafkaProducer.send(producerRecord, ((metadata, exception) -> {
                 // In the callback, always ensure that the operation has been successful by checking if there is
-                // an execution
+                // an exception
+                // Note: Callbacks are blocking the KafkaProducer thread and are invoked sequentially and synchronously
+                // thus it is important to have low latency callback
                 if (exception != null) {
+                    // TODO: Probably just logging the exception is not enough
+                    // You could stop the application, notify the error to another system, etc...
                     logger.error("Failed sending message to Apache Kafka", exception);
                     return;
                 }
 
-                // To avoid verbose logging, rely on TRACE or DEBUG level
+                // Avoid verbose logging in the nominal path, rely on TRACE or DEBUG level
                 logger.trace("Successfully sent message {} to partition {} and offset {}", payment.getId(), metadata.partition(), metadata.partition());
             }));
         }

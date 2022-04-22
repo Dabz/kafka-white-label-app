@@ -17,6 +17,7 @@
         <logback-classic.version>1.2.3</logback-classic.version>
         <avro.version>1.11.0</avro.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+        <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
     </properties>
 
 
@@ -35,6 +36,7 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- Avro Maven plugin to generate Java classes from the Avro definition file (avsc) -->
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
                 <version>${avro.version}</version>
@@ -52,6 +54,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- Maven Assembly Plugin to generate a Uber jar containing all dependencies -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven-assembly-plugin.version}</version>
@@ -94,6 +97,12 @@
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <version>${confluent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
