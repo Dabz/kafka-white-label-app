@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "name": "Order",
+  "namespace": "io.confluent.dabz.model",
+  "fields": [
+    {
+      "name": "order_number",
+      "type": "string",
+      "doc": "Order unique identifier"
+    },
+    {
+      "name": "lines",
+      "doc": "Content of purchase order, one line per purchased item",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderLine",
+          "fields": [
+            {
+              "name": "quantity",
+              "type": "int"
+            },
+            {
+              "name": "item_id",
+              "type": "string"
+            },
+            {
+              "name": "price",
+              "type": {
+                "type": "bytes",
+                "logicalType": "decimal",
+                "precision": 4,
+                "scale": 2
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

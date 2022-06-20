@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "Item",
+  "namespace": "io.confluent.dabz.model",
+  "fields": [
+    {
+      "name": "item_number",
+      "type": "string",
+      "doc": "Item unique identifier"
+    },
+    {
+      "name": "item_name",
+      "type": "string"
+    },
+    {
+      "name": "item_category",
+      "type": "string"
+    }
+  ]
+}
